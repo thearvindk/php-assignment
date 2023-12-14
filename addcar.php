@@ -1,13 +1,18 @@
 <?php
 session_start();
-include 'includes/db.php';
+require_once "db.php";
 
 // Check if the user is logged in and is a car rental agency
-if (!isset($_SESSION["username"]) || !isset($_SESSION["user_type"]) || $_SESSION["user_type"] !== "agency") {
+if (!isset($_SESSION["username"]) || !isset($_SESSION["user_type"]) || $_SESSION["user_type"] !== "agencies") {
     header("Location: login.php");
     exit();
 }
-
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["logout"])) {
+    // Destroy the session and redirect to the login page
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Add new cars code for car rental agency
     // Retrieve and validate form data
@@ -39,6 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Add New Cars</title>
 </head>
 <body>
+<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        <button type="submit" id="lo" class="btn btn-outline-danger" name="logout">Logout</button><br>
+    </form>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -61,11 +69,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <input type="number" class="form-control" name="rent_per_day" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Car</button>
+                    <button type="button" class="btn btn-primary" onclick="redirectToViewBookedCars()">View Booked Cars</button>
                 </form>
             </div>
         </div>
     </div>
-
+    <script>
+        function redirectToViewBookedCars() {
+            window.location.href = 'view_booked_cars.php';
+        }
+    </script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

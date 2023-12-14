@@ -1,18 +1,20 @@
 <?php
+session_start();
+
 require_once "db.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_SESSION["username"]) ) {
     // Login code for both customer and car rental agency
     $username = $_POST["username"];
     $password = $_POST["password"];
     $user_type = $_POST["user_type"];
 
-    if ($user_type == "customer") {
+    if ($user_type == "customers") {
         $table = "customers";
         $redirect_url = "bookings.php";
-    } elseif ($user_type == "agency") {
-        $table = "car_rental_agencies";
-        $redirect_url = "addcars.php";
+    } elseif ($user_type == "agencies") {
+        $table = "agencies";
+        $redirect_url = "addcar.php";
     } else {
         echo "Invalid user type";
         exit();
@@ -30,6 +32,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "Invalid username or password";
     }
+}
+else{
+    if(isset($_SESSION["username"])&&isset($_SESSION["user_type"])){
+        $username = $_SESSION["username"];
+    $user_type = $_SESSION["user_type"];
+
+    if ($user_type == "customers") {
+        $table = "customers";
+        $redirect_url = "bookings.php";
+    } elseif ($user_type == "agencies") {
+        $table = "agencies";
+        $redirect_url = "addcar.php"; 
+    } else {
+        echo "Invalid user type";
+        exit();
+    }
+    header("Location: $redirect_url");
+    }
+    
 }
 ?>
 
@@ -59,11 +80,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-group">
                         <label>User Type:</label><br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="user_type" id="customer" value="customer" checked>
+                            <input class="form-check-input" type="radio" name="user_type" id="customer" value="customers" checked>
                             <label class="form-check-label" for="customer">Customer</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="user_type" id="agency" value="agency">
+                            <input class="form-check-input" type="radio" name="user_type" id="agency" value="agencies">
                             <label class="form-check-label" for="agency">Car Rental Agency</label>
                         </div>
                     </div>
