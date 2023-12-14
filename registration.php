@@ -1,32 +1,27 @@
 <?php
-require_once "db.php";
+include 'includes/db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Login code for both customer and car rental agency
+    // Registration code for both customer and car rental agency
     $username = $_POST["username"];
     $password = $_POST["password"];
     $user_type = $_POST["user_type"];
 
     if ($user_type == "customer") {
-        $table = "customers";
-        $redirect_url = "customer_dashboard.php";
+        // Registration for customer
+        $sql = "INSERT INTO customers (username, password) VALUES ('$username', '$password')";
     } elseif ($user_type == "agency") {
-        $table = "car_rental_agencies";
-        $redirect_url = "agency_dashboard.php";
+        // Registration for car rental agency
+        $sql = "INSERT INTO car_rental_agencies (username, password) VALUES ('$username', '$password')";
     } else {
         echo "Invalid user type";
         exit();
     }
 
-    $sql = "SELECT * FROM $table WHERE username='$username' AND password='$password'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        // Redirect to respective dashboard or home page
-        header("Location: $redirect_url");
-        exit();
+    if ($conn->query($sql) === TRUE) {
+        echo "Registration successful";
     } else {
-        echo "Invalid username or password";
+        echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
 ?>
@@ -38,14 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <title>Login</title>
+    <title>Registration</title>
 </head>
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <form action="" method="post">
-                    <h2>Login</h2>
+                    <h2>Registration</h2>
                     <div class="form-group">
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" name="username" required>
@@ -65,10 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <label class="form-check-label" for="agency">Car Rental Agency</label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <button type="button" class="btn btn-primary" onclick="location.href='registration.php';">Register</button>
+                    <button type="submit" class="btn btn-primary">Register</button>
                 </form>
-                
             </div>
         </div>
     </div>
