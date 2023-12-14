@@ -1,28 +1,57 @@
 <?php
-include 'includes/db.php';
+require_once "db.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Registration code for both customer and car rental agency
-    $username = $_POST["username"];
-    $password = $_POST["password"];
     $user_type = $_POST["user_type"];
-
-    if ($user_type == "customer") {
+    if (empty($_POST["username"])) {
+        $errorMessage = "Username is required";
+    } else {
+        $username = test_input($_POST["username"]);
+    
+        // Check if the username already exists
+        $existingUserQuery = "SELECT * FROM {$user_type} WHERE username = '$username'";
+        $existingUserResult = mysqli_query($conn, $existingUserQuery);
+        $existingUserCount = mysqli_num_rows($existingUserResult);
+    
+        if ($existingUserCount >= 1) {
+            echo "<script>alert('Username Already exists');</script>";
+            $errorMessage = "Username already exists";
+        } else {
+            $username = test_input($_POST["username"]);
+        }
+    }
+    // Validate password
+    if (empty($_POST["password"])) {
+        $errorMessage = "Password is required";
+    } else {
+        $password = test_input($_POST["password"]);
+    }
+    // Registration code for both customer and car rental agency
+    if (empty($errorMessage)) {
+    if ($user_type == "customers") {
         // Registration for customer
         $sql = "INSERT INTO customers (username, password) VALUES ('$username', '$password')";
-    } elseif ($user_type == "agency") {
+    } elseif ($user_type == "agencies") {
         // Registration for car rental agency
-        $sql = "INSERT INTO car_rental_agencies (username, password) VALUES ('$username', '$password')";
+        $sql = "INSERT INTO agencies (username, password) VALUES ('$username', '$password')";
     } else {
         echo "Invalid user type";
         exit();
     }
 
     if ($conn->query($sql) === TRUE) {
-        echo "Registration successful";
+        $_SESSION["sc"]=1;
+        header("Location: login.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
+}
+}
+function test_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 ?>
 
@@ -52,11 +81,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="form-group">
                         <label>User Type:</label><br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="user_type" id="customer" value="customer" checked>
+                            <input class="form-check-input" type="radio" name="user_type" id="customer" value="customers" checked>
                             <label class="form-check-label" for="customer">Customer</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="user_type" id="agency" value="agency">
+                            <input class="form-check-input" type="radio" name="user_type" id="agency" value="agencies">
                             <label class="form-check-label" for="agency">Car Rental Agency</label>
                         </div>
                     </div>

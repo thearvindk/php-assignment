@@ -9,10 +9,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user_type == "customer") {
         $table = "customers";
-        $redirect_url = "customer_dashboard.php";
+        $redirect_url = "bookings.php";
     } elseif ($user_type == "agency") {
         $table = "car_rental_agencies";
-        $redirect_url = "agency_dashboard.php";
+        $redirect_url = "addcars.php";
     } else {
         echo "Invalid user type";
         exit();
@@ -23,6 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         // Redirect to respective dashboard or home page
+        $_SESSION["username"] = $username;
+        $_SESSION["user_type"] = $user_type;
         header("Location: $redirect_url");
         exit();
     } else {
